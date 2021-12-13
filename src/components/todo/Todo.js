@@ -7,7 +7,7 @@ import "./to-do.scss";
 
 const ToDo = () => {
   const listObject = useContext(ListContext);
-  const [incomplete, setIncomplete] = useState([]);
+  const { list, incomplete } = listObject;
 
   function deleteItem(id) {
     const items = list.filter((item) => item.id !== id);
@@ -15,17 +15,12 @@ const ToDo = () => {
   }
 
   useEffect(() => {
-    let incompleteCount = listObject.list.filter(
-      (item) => !item.complete
-    ).length;
-
-    setIncomplete(incompleteCount);
     document.title = `To Do List: ${incomplete}`;
-  }, [listObject.list]);
+  }, [list]);
 
   return (
     <>
-      <Header incomplete={incomplete} />
+      {/* <Header incomplete={incomplete} /> */}
       <div className="form-list">
         <Form />
         <List />

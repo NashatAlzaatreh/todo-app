@@ -1,0 +1,30 @@
+@import "~normalize.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+.list-container {
+  width: 433px;
+
+  .card {
+    margin: 0.5rem 0;
+    width: 100%;
+
+    span {
+      margin-right: 1.5rem;
+    }
+  }
+  .page-select {
+    width: 100%;
+  }
+
+  .navigation {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 6rem;
+
+    button {
+      margin: 0.45rem;
+    }
+  }
+}

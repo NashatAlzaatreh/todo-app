@@ -2,9 +2,16 @@ import React, { useContext, useState, useEffect } from "react";
 import "./list.scss";
 import { ListContext } from "../../context/List";
 import { Button, Card, Elevation, Switch } from "@blueprintjs/core";
+import { When } from "react-if";
 import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
-function List() {
+import { LoginContext } from "../../context/loginContext";
+
+function List(props) {
+  const login = useContext(LoginContext);
+  const { loggedIn, can } = login;
+  const doHaveCapabilities = can(props.capability);
+
   const {
     list,
     toggleComplete,
@@ -12,6 +19,7 @@ function List() {
     showIncomplete,
     handleNumber,
     handleIncomplete,
+    deleteItem,
   } = useContext(ListContext);
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(3);
@@ -60,18 +68,6 @@ function List() {
     setStart(start + num);
     setEnd(end + num);
   }
-
-  // function onlyIncomplete() {
-  //   if (filter == list)
-  //     setFilter(() => filter.filter((item) => item.complete != true));
-  //   else setFilter(list);
-  // }
-
-  // function choose(e) {
-  //   setNumber(Number(e.target.value));
-  //   setEnd(Number(e.target.value));
-  //   setStart(0);
-  // }
 
   function pagination(e) {
     setStart(Number(e.target.id) * number - number);
@@ -128,16 +124,25 @@ function List() {
                   <span> {item.assignee} </span>
                 </h5>
                 <p>{item.text}</p>
-                <Button
-                  className={
-                    item.complete
-                      ? "bp3-small bp3-outlined bp3-intent-success"
-                      : "bp3-small bp3-outlined bp3-intent-danger"
-                  }
-                  onClick={() => toggleComplete(item.id)}
-                >
-                  {item.complete ? "Complete" : "Incomplete"}
-                </Button>
+                <When condition={loggedIn && doHaveCapabilities}>
+                  <Button
+                    className="bp3-small bp3-intent-danger"
+                    icon="trash"
+                    onClick={() => deleteItem(item.id)}
+                  />
+                </When>
+                <When condition={loggedIn && doHaveCapabilities}>
+                  <Button
+                    className={
+                      item.complete
+                        ? "bp3-small bp3-outlined bp3-intent-success"
+                        : "bp3-small bp3-outlined bp3-intent-danger"
+                    }
+                    onClick={() => toggleComplete(item.id)}
+                  >
+                    {item.complete ? "Complete" : "Incomplete"}
+                  </Button>
+                </When>
               </Card>
             );
           })}

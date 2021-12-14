@@ -5,11 +5,49 @@ import { Button, Card, Elevation, Switch } from "@blueprintjs/core";
 import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
 function List() {
-  const { list, toggleComplete } = useContext(ListContext);
+  const {
+    list,
+    toggleComplete,
+    number,
+    showIncomplete,
+    handleNumber,
+    handleIncomplete,
+  } = useContext(ListContext);
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(3);
   const [filter, setFilter] = useState([]);
-  const [number, setNumber] = useState(3);
+  // const [number, setNumber] = useState(3);
+  const [page, setPage] = useState(null);
+
+  useEffect(() => {
+    setStart(0);
+    setEnd(number);
+    const pages = [];
+    for (let i = 1; i <= Math.ceil(filter.length / number); i++) {
+      pages[i] = i;
+    }
+    setPage(pages);
+  }, [number]);
+
+  useEffect(() => {
+    setFilter(list);
+  }, [list]);
+
+  useEffect(() => {
+    const pages = [];
+    for (let i = 1; i <= Math.ceil(filter.length / number); i++) {
+      pages[i] = i;
+    }
+    setPage(pages);
+  }, [filter]);
+
+  useEffect(() => {
+    if (showIncomplete)
+      setFilter(() => filter.filter((item) => item.complete != true));
+    else setFilter(list);
+  }, [showIncomplete]);
+
+  // 0000000000000
 
   function next(num, length) {
     if (start + Math.abs(num) > length) return;
@@ -23,17 +61,17 @@ function List() {
     setEnd(end + num);
   }
 
-  function onlyIncomplete() {
-    if (filter == list)
-      setFilter(() => filter.filter((item) => item.complete != true));
-    else setFilter(list);
-  }
+  // function onlyIncomplete() {
+  //   if (filter == list)
+  //     setFilter(() => filter.filter((item) => item.complete != true));
+  //   else setFilter(list);
+  // }
 
-  function choose(e) {
-    setNumber(Number(e.target.value));
-    setEnd(Number(e.target.value));
-    setStart(0);
-  }
+  // function choose(e) {
+  //   setNumber(Number(e.target.value));
+  //   setEnd(Number(e.target.value));
+  //   setStart(0);
+  // }
 
   function pagination(e) {
     setStart(Number(e.target.id) * number - number);
@@ -52,10 +90,12 @@ function List() {
   return (
     <div>
       <div className="list-container">
-        <Switch onClick={onlyIncomplete}>Only In-Complete</Switch>
+        <Switch checked={showIncomplete} onClick={handleIncomplete}>
+          Only In-Complete
+        </Switch>
         <div className="page-select">
           <label>Number of Item Displayed</label>
-          <select onClick={choose}>
+          <select onClick={handleNumber}>
             <option value="3">Select One</option>
             <option value="3">3</option>
             <option value="6">6</option>

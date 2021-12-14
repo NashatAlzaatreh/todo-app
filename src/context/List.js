@@ -55,6 +55,7 @@ function list(props) {
   // use useEffect when mounting to check local storage settings and update the states
   useEffect(() => {
     let local = localStorage.getItem("settings");
+    console.log(local);
     if (local) {
       let settings = JSON.parse(local);
       setNumber(Number(settings.number));

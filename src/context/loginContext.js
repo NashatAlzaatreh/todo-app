@@ -6,12 +6,14 @@ import cookie from "react-cookies";
 export const LoginContext = React.createContext();
 
 export default function LoginProvider(props) {
-  const API = "https://houses--safe.herokuapp.com";
+  const API = "https://todo-nashat.herokuapp.com";
   const [loggedIn, setLoggedIn] = useState(false);
-  //   const [user, setUser] = useState({});
-  const [user, setUser] = useState({ email: "", capabilities: [] });
+  const [user, setUser] = useState({});
+  // const [user, setUser] = useState({ email: "", capabilities: [] });
 
-  user.capabilities = ["read", "create", "update", "delete"];
+  // user.capabilities = ["read", "create", "update", "delete"];
+  const [capabilities, setCapabilities] = useState(null);
+
   //   user.capabilities = ["read", "create"];
 
   // it will update the LoggedIn flag into true
@@ -23,8 +25,25 @@ export default function LoginProvider(props) {
           "authorization",
           `Basic ${base64.encode(`${username}:${password}`)}`
         );
-      console.log("response.body >>>", response.body);
+
+      const acl = response.body.user.capabilities;
+      setCapabilities(acl);
+      cookie.save("acl", acl);
+
       validateMyToken(response.body.token);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const signupFunction = async (username, password, role) => {
+    try {
+      const response = await superagent.post(`${API}/signup`, {
+        username,
+        password,
+        role,
+      });
+      loginFunction(username, password);
     } catch (err) {
       console.log(err);
     }
@@ -35,6 +54,7 @@ export default function LoginProvider(props) {
     setLoggedIn(false);
     setUser({});
     cookie.remove("token");
+    cookie.remove("acl");
   };
 
   const validateMyToken = (token) => {
@@ -53,13 +73,15 @@ export default function LoginProvider(props) {
   useEffect(() => {
     // check the token
     const myTokenCookie = cookie.load("token");
+    const acl = cookie.load("acl");
+    setCapabilities(acl);
     validateMyToken(myTokenCookie);
   }, []);
 
   const can = (capability) => {
     // chaining
     //optional chaining
-    return user?.capabilities?.includes(capability);
+    return capabilities?.includes(capability);
   };
   const state = {
     loggedIn: loggedIn,
@@ -67,6 +89,8 @@ export default function LoginProvider(props) {
     loginFunction: loginFunction,
     logoutFunction: logoutFunction,
     can: can,
+    signupFunction: signupFunction,
+    capabilities: capabilities,
   };
   return (
     <LoginContext.Provider value={state}>

@@ -123,7 +123,7 @@ function List(props) {
                   </span>
                   <span> {item.assignee} </span>
                 </h5>
-                <p>{item.text}</p>
+                <p>{item.description}</p>
                 <When condition={loggedIn && doHaveCapabilities}>
                   <Button
                     className="bp3-small bp3-intent-danger"
@@ -134,13 +134,13 @@ function List(props) {
                 <When condition={loggedIn && doHaveCapabilities}>
                   <Button
                     className={
-                      item.complete
+                      item.completeStatus === "yes"
                         ? "bp3-small bp3-outlined bp3-intent-success"
                         : "bp3-small bp3-outlined bp3-intent-danger"
                     }
-                    onClick={() => toggleComplete(item.id)}
+                    onClick={() => toggleComplete(item.id, item.completeStatus)}
                   >
-                    {item.complete ? "Complete" : "Incomplete"}
+                    {item.completeStatus === "yes" ? "Complete" : "Incomplete"}
                   </Button>
                 </When>
               </Card>
